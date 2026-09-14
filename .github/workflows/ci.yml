@@ -1,0 +1,20 @@
+name: interlock-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install -r requirements-test.txt
+      - name: Static preflight
+        run: python scripts/preflight.py
+      - name: Direct Mode tests
+        run: pytest -q tests/direct

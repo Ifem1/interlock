@@ -1,0 +1,2 @@
+# Stable StudioNet direct-mode baseline used by existing 61999 contracts.
+genlayer-test @ git+https://github.com/genlayerlabs/genlayer-testing-suite@v0.29.2
