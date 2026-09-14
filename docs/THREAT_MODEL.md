@@ -12,6 +12,8 @@ The admitting owner may describe a destructive operation as harmless. Interlock 
 
 Mitigation: every grant binds an exact `action_hash`. Production gateways/consumers must define a canonical action encoding and ensure that hash commits to the actual target, method, arguments, nonce/domain, and any other execution-critical fields. Interlock makes no truth claim beyond the frozen admitted intent.
 
+Trusted-mode assumption: the resource owner or owner-controlled gateway is trusted to admit only actors and actions it intends to coordinate, and to derive each `action_hash` from the canonical executable action. Interlock prevents arbitrary callers from injecting locks and enforces the pinned hashes, but it cannot detect a trusted owner deliberately admitting a misleading description or an incorrect action preimage.
+
 The example consumer has only been exercised in Direct Mode through a controlled interface stub. Studio's current UI reports that it does not support contract-to-contract interactions. The live call is therefore an explicit unverified boundary, not evidence that deployment alone established composability.
 
 ## Owner rewrites semantics after admission

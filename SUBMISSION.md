@@ -87,5 +87,5 @@ Prepared only for **StudioNet chain ID 61999**.
 
 ## Live verification boundary
 
-Both contracts have finalized deployments on Studio chain ID 61999 (receipts and addresses are in `docs/STUDIONET_EVIDENCE.md`). Studio's current UI says it does not support contract-to-contract interactions. As a result, the core resource lifecycle, non-owner rejection, and actor-bound admissions are represented by finalized on-chain evidence; the rotated CANCEL pair resolution and consumer IC-to-IC call remain unclaimed until finalized or supported. The local Direct Mode suite covers those protocol paths; the live reviewer demo is incomplete until the target Studio environment can execute contract-to-contract calls and ordinary contract methods.
+Interlock has a finalized deployment on Studio chain ID 61999 at the address recorded in `docs/STUDIONET_EVIDENCE.md`. The earlier ProtectedResource deployment predates the corrected Interlock bytecode and must not be presented as the current paired deployment. Studio's current UI says it does not support contract-to-contract interactions, so the corrected ProtectedResource redeployment and consumer IC-to-IC call remain unproven until Studio permits them.
 
