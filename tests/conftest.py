@@ -5,6 +5,30 @@ import os
 import sys
 
 
+# genlayer-test 0.29.2 resolves "latest" GenVM dynamically. Its latest release
+# changed the runner bundle name, so the plugin's hard-coded universal-tarball
+# URL returns 404 on a clean runner. StudioNet's stable SDK/runtime is v0.2.16;
+# pin Direct Mode to that published, compatible bundle for reproducible CI.
+DIRECT_MODE_GENVM_VERSION = "v0.2.16"
+
+
+@pytest.fixture
+def direct_deploy(direct_vm):
+    from pathlib import Path
+    from gltest.direct.loader import deploy_contract
+
+    def _deploy(contract_path, *args, sdk_version=None, **kwargs):
+        return deploy_contract(
+            Path(contract_path),
+            direct_vm,
+            *args,
+            sdk_version=sdk_version or DIRECT_MODE_GENVM_VERSION,
+            **kwargs,
+        )
+
+    return _deploy
+
+
 @pytest.fixture(autouse=True)
 def _reset_contract_registry(monkeypatch):
     # genlayer-test 0.29.2 swaps a temporary message file onto stdin and then

@@ -191,6 +191,27 @@ def clean_text(value: typing.Any, limit: int) -> str:
     return " ".join(str(value).strip().split())[:limit]
 
 
+def normalize_address(value: typing.Any, field: str) -> Address:
+    """Normalize ABI-decoded addresses across GenLayer SDK call surfaces.
+
+    Stable Studio currently decodes address arguments as their unsigned integer
+    representation. Storage descriptors require an Address instance, so
+    normalize at the public boundary before comparing, storing, or emitting.
+    """
+    if isinstance(value, bool):
+        raise gl.vm.UserError(f"{ERR_EXPECTED}: invalid {field}")
+    if isinstance(value, int):
+        if value < 0 or value >= (1 << 160):
+            raise gl.vm.UserError(f"{ERR_EXPECTED}: invalid {field}")
+        return Address(f"0x{value:040x}")
+    if isinstance(value, Address):
+        return value
+    try:
+        return Address(str(value))
+    except Exception as exc:
+        raise gl.vm.UserError(f"{ERR_EXPECTED}: invalid {field}") from exc
+
+
 def message_timestamp() -> int:
     message = getattr(gl, "message", None)
     raw_message = getattr(message, "raw", None)
@@ -385,12 +406,14 @@ def relation_prompt(resource: ResourceProfile, left: Intent, right: Intent) -> s
             "definition_hash": str(resource.definition_hash),
         },
         "left": {
+            "actor": str(left.actor),
             "operation": str(left.operation),
             "mode": mode_name(int(left.mode)),
             "description": str(left.description),
             "action_hash": str(left.action_hash),
         },
         "right": {
+            "actor": str(right.actor),
             "operation": str(right.operation),
             "mode": mode_name(int(right.mode)),
             "description": str(right.description),
@@ -409,6 +432,11 @@ Definitions:
 - AMBIGUOUS: the supplied resource semantics or intent descriptions are insufficient to establish COMMUTES safely.
 
 Conservative rule: if unsure, AMBIGUOUS. Never infer missing locks, retries, compensation, isolation, ownership, or capacity guarantees.
+
+Actor handling:
+- The actor address on each intent is frozen input. Use it when deciding whether the described effects depend on actor identity or ownership.
+- Different actor addresses alone do not imply a conflict and do not establish authorization failure. Admission and authorization are outside this classifier.
+- Use IDENTITY_OR_OWNERSHIP only when the resource definition and these operations show that one operation can affect the other's identity/ownership assumptions or outcome. If those semantics are not established, use AMBIGUOUS with UNKNOWN_SEMANTIC rather than guessing.
 
 Conflict-mask bits (bitwise OR):
 1  WRITE_OVERLAP
@@ -711,6 +739,7 @@ class Interlock(gl.Contract):
         queue_ttl_seconds: u256,
         lease_seconds: u256,
     ) -> u256:
+        actor = normalize_address(actor, "actor")
         resource = self._require_resource(resource_id)
         if int(resource.status) != RESOURCE_ACTIVE:
             raise gl.vm.UserError(f"{ERR_EXPECTED}: resource is paused")
@@ -985,6 +1014,7 @@ class Interlock(gl.Contract):
         actor: Address,
     ) -> bool:
         try:
+            actor = normalize_address(actor, "actor")
             intent = self._require_intent(intent_id)
             if int(intent.status) != INTENT_GRANTED:
                 return False

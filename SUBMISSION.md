@@ -61,7 +61,7 @@ A consumer contract can gate a state transition on:
 is_grant_active(intent_id, resource_hash, action_hash, actor)
 ```
 
-The included `ProtectedResource` implements that boundary and adds local one-time replay protection. The 27-test Direct Mode suite exercises reject/accept/replay behavior through a controlled interface stub, and GenVM lint accepts the typed interface declaration. StudioNet Studio currently states that it does not support contract-to-contract interactions, so this submission does not claim that the live IC-to-IC call or consumer lifecycle has been proven on chain 61999. Production gateways/consumers must compute or verify the action hash from a canonical executable action representation and domain-separate it to the intended consumer.
+The included `ProtectedResource` implements that boundary and adds local one-time replay protection. The 30-test Direct Mode suite exercises reject/accept/replay behavior through a controlled interface stub, and GenVM lint accepts the typed interface declaration. StudioNet Studio currently states that it does not support contract-to-contract interactions, so this submission does not claim that the live IC-to-IC call or consumer lifecycle has been proven on chain 61999. Production gateways/consumers must compute or verify the action hash from a canonical executable action representation and domain-separate it to the intended consumer.
 
 ## Intended use cases
 
@@ -87,4 +87,5 @@ Prepared only for **StudioNet chain ID 61999**.
 
 ## Live verification boundary
 
-Both contracts have finalized deployments on Studio chain ID 61999 (receipts and addresses are in `docs/STUDIONET_EVIDENCE.md`). Studio's current UI says it does not support contract-to-contract interactions. As a result, no resource lifecycle, non-owner rejection, semantic pair decision, or live consumer call is represented as on-chain demo evidence. The local Direct Mode suite covers those protocol paths; the live reviewer demo is incomplete until the target Studio environment can execute contract-to-contract calls and ordinary contract methods.
+Both contracts have finalized deployments on Studio chain ID 61999 (receipts and addresses are in `docs/STUDIONET_EVIDENCE.md`). Studio's current UI says it does not support contract-to-contract interactions. As a result, the core resource lifecycle, non-owner rejection, and actor-bound admissions are represented by finalized on-chain evidence; the rotated CANCEL pair resolution and consumer IC-to-IC call remain unclaimed until finalized or supported. The local Direct Mode suite covers those protocol paths; the live reviewer demo is incomplete until the target Studio environment can execute contract-to-contract calls and ordinary contract methods.
+

@@ -2,7 +2,7 @@
 
 Target: **StudioNet, chain ID 61999**.
 
-This walkthrough is the intended end-to-end demonstration. At the verification date recorded in `STUDIONET_EVIDENCE.md`, Studio's onboarding stated that it does not support contract-to-contract interactions. The deployed contracts therefore do not yet have a complete live lifecycle proof. Do not present the unexecuted steps below as live evidence.
+This walkthrough is the intended end-to-end demonstration. At the verification date recorded in `STUDIONET_EVIDENCE.md`, Studio's onboarding stated that it does not support contract-to-contract interactions. The core Interlock resource and actor-bound admissions are now live evidence in `STUDIONET_EVIDENCE.md`; record only finalized pair-resolution and consumer receipts.
 
 ## Lifecycle to demonstrate when supported
 
@@ -19,3 +19,4 @@ Call `ProtectedResource.execute` with the exact intent ID, pinned resource hash,
 ## Evidence
 
 Only finalized chain transactions belong in `STUDIONET_EVIDENCE.md`. Direct Mode test results are local evidence and must remain clearly distinguished. The current documented Studio limitation prevents claiming the end-to-end scenario or typed IC-to-IC call as live verified.
+

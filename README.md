@@ -256,7 +256,7 @@ pytest -q tests/direct
 python scripts/preflight.py
 ```
 
-The pinned direct suite currently has 27 passing tests covering owner-only admission, distinct actor binding, resource pinning, pause/update restrictions, exact-action deduplication, deterministic read/exclusive cases, semantic commute/conflict/ambiguity, independent validator re-derivation, immutable pair decisions, lease expiry, queue liveness, actor/owner lifecycle authorization, bounded queues, FIFO fairness, and the consumer rejection/acceptance/replay boundary through a test interface stub.
+The pinned direct suite currently has 30 passing tests covering owner-only admission, distinct actor binding, resource pinning, pause/update restrictions, exact-action deduplication, deterministic read/exclusive cases, semantic commute/conflict/ambiguity, independent validator re-derivation, immutable pair decisions, lease expiry, queue liveness, actor/owner lifecycle authorization, bounded queues, FIFO fairness, and the consumer rejection/acceptance/replay boundary through a test interface stub.
 
 ## What Interlock does not prove
 
@@ -289,3 +289,4 @@ scripts/preflight.py                static repository/network checks
 ## License
 
 MIT.
+

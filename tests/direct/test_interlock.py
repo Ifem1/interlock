@@ -218,6 +218,72 @@ def test_semantic_commute_allows_parallel_write_grants(direct_vm, direct_deploy)
     assert direct_vm.run_validator() is True
 
 
+def test_classifier_receives_actor_bindings_without_treating_difference_as_conflict(
+    direct_vm, direct_deploy
+):
+    contract, resource_id = create_resource(direct_vm, direct_deploy)
+    alice = alice_address()
+    bob = bob_address()
+    direct_vm.mock_llm(CLASSIFIER, relation("COMMUTES", 0, "effects are independent"))
+    first = submit(
+        contract, resource_id, "set internal note", 2,
+        "Update only the internal note and leave identity and ownership unchanged.",
+        h("1"), actor=alice,
+    )
+    second = submit(
+        contract, resource_id, "set package label", 2,
+        "Update only the package label and leave identity and ownership unchanged.",
+        h("2"), actor=bob,
+    )
+
+    instance = contract._instance
+    prompt = instance._pair.__globals__["relation_prompt"](
+        instance._require_resource(resource_id),
+        instance._require_intent(first),
+        instance._require_intent(second),
+    )
+    assert f'"actor":"{str(alice)}"' in prompt
+    assert f'"actor":"{str(bob)}"' in prompt
+    assert "Different actor addresses alone do not imply a conflict" in prompt
+
+    assert contract.resolve_intent(first) is True
+    assert contract.resolve_intent(second) is True
+    decision = contract.get_pair_decision(first, second)
+    assert decision["relation_name"] == "COMMUTES"
+    assert "IDENTITY_OR_OWNERSHIP" not in decision["conflict_names"]
+
+
+def test_identity_ownership_conflict_requires_semantic_evidence(direct_vm, direct_deploy):
+    contract, resource_id = create_resource(direct_vm, direct_deploy)
+    contract.update_resource(
+        resource_id,
+        RESOURCE_URI,
+        RESOURCE_SEMANTICS
+        + " The current order owner is the actor whose approval controls fulfilment; "
+        "transferring ownership invalidates an approval that requires current ownership.",
+    )
+    direct_vm.mock_llm(
+        CLASSIFIER,
+        relation("CONFLICTS", 32, "the first operation transfers ownership required by the second"),
+    )
+    first = submit(
+        contract, resource_id, "transfer ownership", 2,
+        "Transfer order ownership away from the actor who must approve fulfilment.",
+        h("3"), actor=alice_address(),
+    )
+    second = submit(
+        contract, resource_id, "approve fulfilment", 2,
+        "Approve fulfilment only while the bound actor remains the order owner.",
+        h("4"), actor=bob_address(),
+    )
+
+    assert contract.resolve_intent(first) is True
+    assert contract.resolve_intent(second) is False
+    decision = contract.get_pair_decision(first, second)
+    assert decision["relation_name"] == "CONFLICTS"
+    assert decision["conflict_names"] == ["IDENTITY_OR_OWNERSHIP"]
+
+
 def test_semantic_conflict_blocks_parallel_grant(direct_vm, direct_deploy):
     contract, resource_id = create_resource(direct_vm, direct_deploy)
     direct_vm.mock_llm(
@@ -497,6 +563,22 @@ def test_active_grant_is_pinned_to_actor_action_and_resource_hash(direct_vm, dir
     assert contract.is_grant_active(intent, resource_hash, action, bob_address()) is False
     assert contract.is_grant_active(intent, resource_hash, h("9"), alice_address()) is False
     assert contract.is_grant_active(intent, h("a"), action, alice_address()) is False
+
+
+def test_abi_integer_actor_is_normalized_before_storage(direct_vm, direct_deploy):
+    contract, resource_id = create_resource(direct_vm, direct_deploy)
+    actor = bob_address()
+    actor_int = int(str(actor), 16)
+    intent = submit(
+        contract, resource_id, "dispatch", 2,
+        "Dispatch order 812 from the warehouse and mark it as fulfilled.",
+        h("d"), actor=actor_int,
+    )
+    stored = contract.get_intent(intent)
+    assert stored["actor"].lower() == str(actor).lower()
+    contract.resolve_intent(intent)
+    resource_hash = contract.get_resource(resource_id)["definition_hash"]
+    assert contract.is_grant_active(intent, resource_hash, h("d"), actor_int) is True
 
 
 def test_pair_decision_is_cached(direct_vm, direct_deploy):

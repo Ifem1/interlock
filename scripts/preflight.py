@@ -29,8 +29,18 @@ SECRET_PATTERNS = [
     re.compile(r"0x[a-fA-F0-9]{64}"),
 ]
 PUBLIC_RECEIPT_HASHES = {
-    "0x50d7acf99e4401e53e412198ae5ec8bcabe534e8139e0ed396f4b208885ebdbd",
-    "0xe560813006d8d17029589e10698ae867c4597c50f7c7340010ca768452f92b91",
+    # Public 32-byte hashes may appear in live evidence (deployment and
+    # lifecycle receipts, canonical actions, resource definitions, decisions).
+    "0xacfa75c76d7926e658abbf501dd83120fdd247d482f096ed59cf355b69349b9a",
+    "0x511aadaee9c914dc650cc606d44508ec4365c31d83dea42152e2dd43f19cf0b7",
+    "0x034ea2e3d9e0faf3b05d2483d3c248fbf8425c9e302347bc01dbb7e57d9634a6",
+    "0x228cfae053473c51732d06c11d84271b2f38d169f88a5680ba88c6e456850a52",
+    "0xe88dcc843d4188709720d039c2cd9eb8f469fa206e80d3210ef949870d1d6782",
+    "0x0ab62edcad35e1886b481324582520455fc085a0f54d83fe2459b09024a02601",
+    "0xbb6edb40ba45a916299590f09134d8df7e81ccc7b313c5f81c9fa09067707508",
+    "0x0a41470c9f19ecb4d9a244b078308bb2eecf62c2777939703c8dc8ffd5d9d513",
+    "0xd2cccaac729de07d0281db1c312865558d910c62c0454faccc6eb4f0d6dccf8e",
+    "0x51dd7d9acf550103057daea4d0f21741c9c5c2c605af7d116ba0cae448629b66",
 }
 
 

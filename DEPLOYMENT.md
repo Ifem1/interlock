@@ -18,7 +18,7 @@ python scripts/preflight.py
 pytest -q tests/direct
 ```
 
-All direct tests must pass before any deployment evidence is written into the repository. The test count at this revision is 27.
+All direct tests must pass before any deployment evidence is written into the repository. The test count at this revision is 30.
 
 ## Deploy order
 
@@ -39,3 +39,4 @@ At this submission's verification time, Studio's UI explicitly reports that cont
 ## Evidence policy
 
 The repository currently contains **no fabricated deployment addresses or transaction hashes**. The final agent must insert only evidence obtained from finalized StudioNet transactions.
+

@@ -1,31 +1,26 @@
-# StudioNet evidence
+# StudioNet live evidence
 
-## Finalized deployment receipts
+Target network: **StudioNet, chain ID 61999** (`https://studio.genlayer.com/api`). The Studio selector showed `GenLayer Studio chain 61999 · local` immediately before each transaction below.
 
-The Studio network selector displayed **GenLayer Studio, chain 61999 · local** and was selected immediately before each deployment transaction. Both deployments reached `FINALIZED` in Studio.
+## Deployments (FINALIZED, SUCCESS)
 
-| Contract | Address | Finalized transaction hash |
-|---|---|---|
-| Interlock | `0xa51c5E2602a5BF489e9A15dccc04dE1E461a61C4` | `0x50d7acf99e4401e53e412198ae5ec8bcabe534e8139e0ed396f4b208885ebdbd` |
-| ProtectedResource (deployed with the Interlock address) | `0x00c010Ab0c746c88CAB24f0523B75e68DCFc140b` | `0xe560813006d8d17029589e10698ae867c4597c50f7c7340010ca768452f92b91` |
+- Interlock: `0xA23e95942E03Cb63614C6cB212A8C2b56F9DE061`
+  - tx `0xacfa75c76d7926e658abbf501dd83120fdd247d482f096ed59cf355b69349b9a`
+- ProtectedResource, constructed with that Interlock address: **previous deployment remains valid only for the prior bytecode**; the corrected Interlock redeployment requires a fresh consumer deployment before claiming live IC-to-IC compatibility.
 
-Interlock's finalized deployment page linked to `https://explorer-studio.genlayer.com/address/0xa51c5E2602a5BF489e9A15dccc04dE1E461a61C4`. ProtectedResource's finalized deployment page linked to `https://explorer-studio.genlayer.com/address/0x00c010Ab0c746c88CAB24f0523B75e68DCFc140b`.
+## Corrected core lifecycle (Interlock)
 
-## Live lifecycle status
+- Resource creation tx: `0x511aadaee9c914dc650cc606d44508ec4365c31d83dea42152e2dd43f19cf0b7`, FINALIZED/SUCCESS; returned resource ID `1`.
+- Resource definition hash: `51dd7d9acf550103057daea4d0f21741c9c5c2c605af7d116ba0cae448629b66`.
+- Owner: `0x38D2270Ba7224b7771A30fE20Ec4A12616d15DF0`.
+- Explicit actor: `0x9A91f6fe04700744fD3838cA2c63161b261Cb919`.
+- Non-owner admission tx: `0x034ea2e3d9e0faf3b05d2483d3c248fbf8425c9e302347bc01dbb7e57d9634a6`, FINALIZED/ACCEPTED with Result `ERROR`: `EXPECTED: only resource owner may admit intents`.
+- Owner admission of DISPATCH returned intent ID `1`; tx `0x228cfae053473c51732d06c11d84271b2f38d169f88a5680ba88c6e456850a52`, FINALIZED/SUCCESS.
+- Owner admission of CANCEL returned intent ID `2`; tx `0xe88dcc843d4188709720d039c2cd9eb8f469fa206e80d3210ef949870d1d6782`, FINALIZED/SUCCESS.
+- Canonical action hashes (domain `interlock-action/v1`, resource ID `1`, resource hash above): DISPATCH `0a41470c9f19ecb4d9a244b078308bb2eecf62c2777939703c8dc8ffd5d9d513`; CANCEL `d2cccaac729de07d0281db1c312865558d910c62c0454faccc6eb4f0d6dccf8e`.
+- DISPATCH resolve tx `0x0ab62edcad35e1886b481324582520455fc085a0f54d83fe2459b09024a02601` reached consensus and finalized; DISPATCH became GRANTED.
+- CANCEL resolve tx `0xbb6edb40ba45a916299590f09134d8df7e81ccc7b313c5f81c9fa09067707508` is still in Studio validator rotation at the time of this edit; no final relation or grant claim is recorded until its receipt visibly finalizes.
 
-No live resource or intent lifecycle evidence is claimed. Studio's onboarding states that the current Studio does not support contract-to-contract interactions. That prevents proving the typed `IInterlock(...).view().is_grant_active(...)` invocation and the downstream consumer behavior in the requested environment. Deployment of ProtectedResource only proves its constructor and storage initialization completed; it does not prove a cross-contract call.
+## Consumer boundary
 
-| Required live demo evidence | Status |
-|---|---|
-| Chain ID 61999 for both deployment transactions | Confirmed in the selected Studio network selector before each deployment |
-| Resource ID and definition hash | Not executed |
-| Non-owner `submit_intent` rejection | Not executed |
-| Intent IDs, actors, and exact action hashes | Not executed |
-| Pair relation and immutable decision hash | Not executed |
-| CANCEL blocked while DISPATCH is active | Not executed |
-| CANCEL grant after blocker completion or expiry | Not executed |
-| ProtectedResource reject before a live grant | Not proven |
-| ProtectedResource accept after a live grant | Not proven |
-| Replay rejection after live execution | Not proven |
-
-The Direct Mode suite verifies the protocol and consumer boundary locally. The live reviewer demo remains incomplete until StudioNet supports and exposes the required contract method and cross-contract transactions. No transaction hashes, resource identifiers, or model results are fabricated here.
+Studio’s onboarding still states that contract-to-contract interactions are unsupported. The corrected consumer deployment and `ProtectedResource.execute` reject/accept/replay path therefore remain unproven live. Direct Mode covers the typed interface boundary with a controlled stub; no IC-to-IC claim is inferred from deployment alone.
